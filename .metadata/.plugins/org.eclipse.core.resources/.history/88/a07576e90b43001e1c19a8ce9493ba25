@@ -1,0 +1,20 @@
+<%@page import="pjmember.PJMemberDAO"%>
+<%@page import="pjmember.PJMemberDTO"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ include file="../IsLoggedIn.jsp" %>
+<%
+PJMemberDTO dto = new PJMemberDTO();
+PJMemberDAO dao = new PJMemberDAO(application);
+
+String pass = request.getParameter("pass");  
+
+dao.deleteMember2(dto);
+// 자원 해제
+dao.close();
+JSFunction.alertLocation("삭제가 정상적으로 처리되었습니다.", "MemberManage.jsp", out);
+
+
+
+
+%>

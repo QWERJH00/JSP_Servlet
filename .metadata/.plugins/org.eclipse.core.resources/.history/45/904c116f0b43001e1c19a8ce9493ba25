@@ -1,0 +1,19 @@
+<%@page import="pjmember.PJMemberDAO"%>
+<%@page import="pjmember.PJMemberDTO"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ include file="../IsLoggedIn.jsp" %>
+<%
+String pass = request.getParameter("pass");  
+
+PJMemberDTO dto = new PJMemberDTO();
+PJMemberDAO dao = new PJMemberDAO(application);
+
+dto.setPass(pass);
+dao.deleteMember2(dto);
+// 자원 해제
+dao.close();
+
+
+
+%>

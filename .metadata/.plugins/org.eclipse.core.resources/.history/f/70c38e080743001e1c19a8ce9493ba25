@@ -1,0 +1,29 @@
+<%@page import="pjmember.PJMemberDAO"%>
+<%@page import="pjmember.PJMemberDTO"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ include file="../IsLoggedIn.jsp" %>
+<%
+String id = (String)session.getAttribute("UserId");
+
+PJMemberDTO dto = new PJMemberDTO();
+PJMemberDAO dao = new PJMemberDAO(application);
+
+String sessionId = session.getAttribute("UserId").toString();
+
+int delResult = 0;
+
+if(sessionId.equals(dto.getId())) {
+	JSFunction.alertLocation("회원삭제 실패.","MemberManage.jsp" , out);
+} else{
+	dto.setId(id);
+	delResult = dao.deleteMember2(dto);
+	dao.close();
+}
+
+
+
+dao.close();
+
+JSFunction.alertLocation("회원삭제가 완료되었습니다.","MemberManage.jsp" , out);
+%>

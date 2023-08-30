@@ -1,0 +1,75 @@
+<%@page import="java.util.Map"%>
+<%@page import="java.util.*"%>
+<%@page import="pjmember.PJMemberDAO"%>
+<%@page import="pjmember.PJMemberDTO"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%
+PJMemberDAO dao = new PJMemberDAO(application);
+Map<String, Object> param = new HashMap<String,Object>();
+/*
+	검색폼에서 입력한 검색어와 필드명을 파라미터로 받아온다.
+	해당 <form>의 전송방식은 get, action속성은 없는 상태이므로
+	현재페이지로 폼값이 전송된다.
+*/
+String searchField = request.getParameter("searchField");
+String searchWord = request.getParameter("searchWord");
+// 사용자가 입력한 검색어가 있다면...
+if (searchWord != null){
+	/* Map컬렉션에 컬럼명과 검색어를 추가한다. */
+	param.put("searchField", searchField);
+	param.put("searchWord", searchWord);
+}
+
+// Map컬렉션을 인수로 게시물의 갯수를 카운트한다.
+int totalCount = dao.selectMember(param);
+
+// 페이징 기능
+int pageSize = 
+Integer.parseInt(application.getInitParameter("POSTS_PER_PAGE"));
+int blockPage = 
+Integer.parseInt(application.getInitParameter("PAGES_PER_BLOCK"));
+
+int totalPage = (int)Math.ceil((double)totalCount / pageSize);
+
+
+int pageNum = 1; 
+String pageTemp = request.getParameter("pageNum");
+if (pageTemp != null && !pageTemp.equals(""))
+	pageNum = Integer.parseInt(pageTemp);
+
+int start = (pageNum - 1) * pageSize + 1;
+int end = pageNum * pageSize;
+param.put("start", start);
+param.put("end", end);
+// 목록에 출력할 게시물을 추출하여 반환받는다.
+List<PJMemberDTO> boardLists = dao.selectList(param);
+// 자원해제
+dao.close();
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style>
+  table {
+    width: 100%;
+    border-top: 1px solid #444444;
+    border-collapse: collapse;
+  }
+  th, td {
+    border-bottom: 1px solid #444444;
+    border-left: 1px solid #444444;
+    padding: 10px;
+  }
+  th:first-child, td:first-child {
+    border-left: none;
+  }
+</style>
+</head>
+<body>
+	<jsp:include page = "../Common2/Link.jsp" /> 
+	
+</body>
+</html>

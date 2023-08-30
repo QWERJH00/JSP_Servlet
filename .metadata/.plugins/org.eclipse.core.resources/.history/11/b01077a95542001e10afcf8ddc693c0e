@@ -1,0 +1,49 @@
+<%@page import="pjboard.PJBoardDTO"%>
+<%@page import="pjboard.PJBoardDAO"%>
+
+<%@ page language="java" contentType="text/html; charset=EUC-KR"
+    pageEncoding="EUC-KR"%>
+<!DOCTYPE html>
+<%
+String id = (String)session.getAttribute("UserId");
+PJBoardDAO dao = new PJBoardDAO(application);
+%>
+<html>
+<head>
+<meta charset="EUC-KR">
+<table border="0" width="90%"> 
+    <tr>
+        <td align="right">
+        <!-- 로그인 여부에 따른 메뉴 변화 -->
+        <% if (session.getAttribute("UserId") == null) { %>
+            <a href="${pageContext.request.contextPath }/PJBoard/Login/LoginForm.jsp">로그인</a>
+        <% } else { %>
+        	<a href="${pageContext.request.contextPath }/PJBoard/Info.jsp"><%=(session.getAttribute("UserId")) %></a>       	
+            <a href="${pageContext.request.contextPath }/PJBoard/Login/Logout.jsp">로그아웃</a>
+        <% } %>
+        <a href="${pageContext.request.contextPath }/PJBoard/NMform.jsp">회원가입</a>
+        
+        </td>
+    </tr>
+    </table>
+<table border="1" width="90%">
+    <tr>
+        <td align ="center">
+            <!-- 8장과 9장의 회원제 게시판 프로젝트에서 사용할 링크 -->
+            <%if(id != null && id.equals("admin")) { %>
+            <a href="${pageContext.request.contextPath }/PJBoard/MemberManage.jsp">회원관리</a>
+            <%} %>
+            &nbsp;&nbsp;&nbsp; 
+            <a href="${pageContext.request.contextPath }/PJBoard/AdList.jsp">공지 게시판</a>
+            &nbsp;&nbsp;&nbsp; 
+            <a href="${pageContext.request.contextPath }/PJBoard/List.jsp">일반 게시판</a>
+        </td>
+    </tr>
+</table>
+
+<title>Insert title here</title>
+</head>
+<body>
+	
+</body>
+</html>

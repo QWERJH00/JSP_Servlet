@@ -1,0 +1,38 @@
+package noticeboard;
+
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+
+import common.JDBConnect;
+
+public class NoBoardDAO extends JDBConnect {
+	
+	public NoBoardDAO(ServletContext application) {
+		super(application);
+	}
+	
+	// 게시물의 갯수를 카운트한다.
+		public int selectCount(Map<String, Object> map) {
+			int totalCount = 0;
+			// 만약 검색어가 있다면 조건에 맞는 게시물을 카운트 해야 하므로
+			// 조건부 (where)로 쿼리문을 추가한다.
+			String query = "SELECT COUNT(*) FROM noticeboard";
+			if (map.get("searchWord") != null) {
+				query += " WHERE " + map.get("searchField") + " "
+					   + " LIKE '%" + map.get("searchWord") + "%'";
+			}
+			try {
+				stmt = con.createStatement();
+				rs = stmt.executeQuery(query);
+				rs.next();
+				totalCount = rs.getInt(1);
+			}
+			catch (Exception e) {
+				System.out.println("게시물 카운트 중 예외 발생");
+				e.printStackTrace();
+			}
+			
+			return totalCount;
+		}
+}

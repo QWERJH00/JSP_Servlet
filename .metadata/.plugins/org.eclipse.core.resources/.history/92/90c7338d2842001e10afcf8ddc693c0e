@@ -1,0 +1,78 @@
+<%@page import="com.oreilly.servlet.MultipartRequest"%>
+<%@page import="pjboard.PJBoardDAO"%>
+<%@page import="pjboard.PJBoardDTO"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    <%@ include file="./IsLoggedIn.jsp" %>
+<%
+String saveDirectory = application.getRealPath("/Uploads");
+//업로드할 파일의 최대용량제한(1MB)로 지정한다.
+int maxPostSize = 1024 * 1000;
+//인코딩 방식 지정
+String encoding = "UTF-8";
+/*
+앞에서 준비한 3개의 인수와 request내장객체까지를 이용해서
+MultipartRequest객체를 생성한다. 해당객체가 정상적으로 생성되면
+파일업로드는 완료된다.
+*/
+try{
+MultipartRequest mr = new MultipartRequest(request, saveDirectory,
+										maxPostSize, encoding);
+
+// mr객체를 통해 서버에 저장된 파일명을 가져온다.
+String fileName = mr.getFilesystemName("attachedFile");
+/*
+파일명에서 앞의 .(닷)을 찾아 인덱스를 확인한 후 확장자를 잘라낸다.
+확장자는 파일의 용도를 나타내는 부분이므로 중요하다.
+파일명에 .(닷)을 여러개 사용할 수 있으므로 끝에서부터 찾는다.
+*/
+String ext = fileName.substring(fileName.lastIndexOf("."));
+// 현재날짜와 시간 및 밀리세컨즈까지 이용해서 파일명으로 사용할 문자열을
+// 만든다.
+String now = new SimpleDateFormat("yyyyMMdd_HmsS").format(new Date());
+// 확장자와 파일명을 합쳐서 서버에 저장할 파일명을 만들어준다.
+String newFileName = now + ext;
+
+File oldFile = new File(saveDirectory + File.separator + fileName);
+File newFile = new File(saveDirectory + File.separator + newFileName);
+oldFile.renameTo(newFile);
+
+// 수정폼에서 입력한 내용을 파라미터로 받는다.
+String num = request.getParameter("num");
+String title = request.getParameter("title");
+String content = request.getParameter("content");
+String ofile = request.getParameter("ofile");
+String sfile = request.getParameter("sfile");
+
+
+// DTO객체에 수정할 내용을 셋팅한다.
+PJBoardDTO dto = new PJBoardDTO();
+dto.setNum(num);
+dto.setTitle(title);
+dto.setContent(content);
+dto.setOfile(ofile);
+dto.setSfile(sfile);
+
+// DAO객체 생성을 통해 오라클에 연결한다.
+PJBoardDAO dao = new PJBoardDAO(application);
+// update 쿼리문을 실행하여 게시물을 수정한다.
+int affected = dao.updateEdit(dto);
+// 자원해제
+dao.close();
+
+if (affected == 1){
+	/*
+		수정이 완료되었으면 수정된 내용을 확인하기 위해 주로 내용보기
+		페이지로 이동한다.
+	*/
+	response.sendRedirect("View2.jsp?num=" + dto.getNum());
+}
+else {
+	// 수정에 실패하면 뒤로 이동한다.
+	JSFunction.alertBack("수정하기에 실패하였습니다.", out);
+}
+}catch(Exception e){
+	e.printStackTrace();
+	System.out.println("수정 예외발생");
+}
+%>
